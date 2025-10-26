@@ -1,7 +1,8 @@
 <script>
   import favicon from "$lib/assets/favicon.svg";
   import "./styles.css";
-  let { children } = $props();
+  let { data, children } = $props();
+  let { user, isAuthenticated } = data;
 </script>
 
 <svelte:head>
@@ -23,15 +24,31 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="/companies">Companies</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/jobs">Jobs</a>
-        </li>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {#if isAuthenticated}
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="/companies"
+              >Companies</a
+            >
+          </li>
+        {/if}
+        {#if isAuthenticated}
+          <li class="nav-item">
+            <a class="nav-link" href="/jobs">Jobs</a>
+          </li>
+        {/if}
       </ul>
+      <div class="d-flex">
+        {#if isAuthenticated}
+          <span class="navbar-text me-2">{user.name}!</span>
+          <form action="/logout" method="POST" class="d-inline">
+            <button class="btn btn-primary" href="/logout">Logout</button>
+          </form>
+        {:else}
+          <a href="/login" class="btn btn-outline-primary me-2" >Login</a>
+          <a href="/signup" class="btn btn-primary">Sign up</a>
+        {/if}
+      </div>
     </div>
   </div>
 </nav>
