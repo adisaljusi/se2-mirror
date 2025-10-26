@@ -6,6 +6,7 @@ const API_BASE_URL = process.env.API_BASE_URL; // defined in frontend/.env
 
 export async function load({ locals }) {
   const jwtToken = locals.jwt_token;
+  const userInfo = locals.user;
 
   if (!jwtToken) {
     return {
@@ -23,13 +24,17 @@ export async function load({ locals }) {
         Authorization: `Bearer ${jwtToken}`,
       },
     });
-    const companiesResponse = await axios({
-      method: "get",
-      url: `${API_BASE_URL}/api/company`,
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
-    });
+
+    let companiesResponse = [];
+    if (userInfo && userInfo.user_roles.includes("admin")) {
+      companiesResponse = await axios({
+        method: "get",
+        url: `${API_BASE_URL}/api/company`,
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      });
+    }
 
     return {
       jobs: jobsResponse.data,

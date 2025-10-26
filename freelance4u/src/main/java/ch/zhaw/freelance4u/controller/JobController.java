@@ -19,6 +19,7 @@ import ch.zhaw.freelance4u.model.JobCreateDTO;
 import ch.zhaw.freelance4u.model.JobType;
 import ch.zhaw.freelance4u.repository.JobRepository;
 import ch.zhaw.freelance4u.service.CompanyService;
+import ch.zhaw.freelance4u.service.UserService;
 
 @RestController
 @RequestMapping("/api/job")
@@ -29,8 +30,14 @@ public class JobController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    UserService userService;
+
     @PostMapping()
     public ResponseEntity<Job> createJob(@RequestBody JobCreateDTO fDto) {
+        if (!userService.userHasRole("admin")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Job fDAO = new Job(fDto.getTitle(), fDto.getDescription(), fDto.getJobType(), fDto.getEarnings(),
                     fDto.getCompanyId());

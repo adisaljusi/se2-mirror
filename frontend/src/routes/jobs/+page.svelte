@@ -1,6 +1,5 @@
 <script>
   import { enhance } from "$app/forms";
-  import axios from "axios";
 
   let { data, form } = $props();
   let { user, isAuthenticated } = data;
