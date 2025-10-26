@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.zhaw.freelance4u.model.Company;
 import ch.zhaw.freelance4u.model.CompanyCreateDTO;
 import ch.zhaw.freelance4u.repository.CompanyRepository;
+import ch.zhaw.freelance4u.service.UserService;
 
 @RestController
 @RequestMapping("/api/company")
 public class CompanyController {
     @Autowired
     CompanyRepository companyRepository;
+
+    @Autowired
+    UserService userService;
 
     @PostMapping()
     public ResponseEntity<Company> createCompany(@RequestBody CompanyCreateDTO fDto) {
@@ -36,12 +40,18 @@ public class CompanyController {
 
     @GetMapping()
     public ResponseEntity<List<Company>> getAllCompanies() {
+        if (!userService.userHasRole("admin")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         List<Company> companies = companyRepository.findAll();
         return ResponseEntity.ok(companies);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Company> getCompanyById(@PathVariable String id) {
+        if (!userService.userHasRole("admin")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         Optional<Company> company = companyRepository.findById(id);
         if (company.isPresent()) {
             return ResponseEntity.ok(company.get());
