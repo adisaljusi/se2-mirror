@@ -31,10 +31,11 @@
               >Companies</a
             >
           </li>
-        {/if}
-        {#if isAuthenticated}
           <li class="nav-item">
             <a class="nav-link" href="/jobs">Jobs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/account">Account</a>
           </li>
         {/if}
       </ul>
@@ -45,7 +46,7 @@
             <button class="btn btn-primary" href="/logout">Logout</button>
           </form>
         {:else}
-          <a href="/login" class="btn btn-outline-primary me-2" >Login</a>
+          <a href="/login" class="btn btn-outline-primary me-2">Login</a>
           <a href="/signup" class="btn btn-primary">Sign up</a>
         {/if}
       </div>
