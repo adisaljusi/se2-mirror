@@ -1,3 +1,10 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.test.config": [
+        {
+            "name": "TestConfig",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ],
+    "java.test.defaultConfig": "TestConfig"
 }
