@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./path/to/your/project
+        working-directory: ./freelance4u
     env:
       MONGODB_URI: ${{ secrets.MONGODB_URI }}
       AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
@@ -35,4 +35,5 @@ jobs:
 
       - name: Run tests
         run: mvn test
+
 
