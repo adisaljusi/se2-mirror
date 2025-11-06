@@ -9,6 +9,12 @@ public class PercentageVoucher implements Voucher {
     private final int discount;
 
     public PercentageVoucher(int discount) {
+        if (discount > 50) {
+            throw new RuntimeException("Error: Discount valü must less or equal 50.");
+        }
+        if (discount <= 0) {
+            throw new RuntimeException("Error: Discount valü must be greater zero.");
+        }
         this.discount = discount;
     }
 
