@@ -12,6 +12,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./path/to/your/project
     env:
       MONGODB_URI: ${{ secrets.MONGODB_URI }}
       AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
@@ -28,7 +31,8 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install
+        
 
       - name: Run tests
-
         run: mvn test
+
