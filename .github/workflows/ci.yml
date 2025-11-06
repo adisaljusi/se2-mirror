@@ -3,10 +3,10 @@ name: Build and Test
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -30,4 +30,5 @@ jobs:
         run: mvn clean install
 
       - name: Run tests
+
         run: mvn test
