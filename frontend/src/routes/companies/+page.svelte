@@ -3,9 +3,14 @@
   let { data, form } = $props();
 
   let companies = $state(data.companies);
+  let currentPage = $state(data.currentPage);
+  let nrOfPages = $state(data.nrOfPages);
+  const pageSize = 5; // change this value if you want more elements per page
 
   $effect(() => {
     companies = data.companies;
+    currentPage = data.currentPage;
+    nrOfPages = data.nrOfPages;
   });
 </script>
 
@@ -64,3 +69,25 @@
     {/each}
   </tbody>
 </table>
+
+<nav>
+  <ul class="pagination">
+    {#each Array(nrOfPages) as _, i}
+      <li class="page-item">
+        <a
+          class="page-link"
+          class:active={currentPage == i + 1}
+          href="/companies?pageNumber={i + 1}&pageSize={pageSize}"
+        >
+          {i + 1}
+        </a>
+      </li>
+    {/each}
+  </ul>
+</nav>
+
+<style>
+  .page-link:focus {
+    box-shadow: none;
+  }
+</style>

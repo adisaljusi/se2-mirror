@@ -4,7 +4,7 @@ import { error } from "@sveltejs/kit";
 import "dotenv/config";
 const API_BASE_URL = process.env.API_BASE_URL; // defined in frontend/.env
 
-export async function load({ locals }) {
+export async function load({ url, locals }) {
   const jwtToken = locals.jwt_token;
   const userInfo = locals.user;
 
@@ -12,14 +12,23 @@ export async function load({ locals }) {
     return {
       jobs: [],
       companies: [],
+      nrOfPages: 0,
+      currentPage: 1,
     };
   }
 
   try {
+    // Get URL parameters for pagination
+    const currentPage = parseInt(url.searchParams.get("pageNumber") || "1");
+    const pageSize = parseInt(url.searchParams.get("pageSize") || "5");
+
+    // Build query string
+    let query = `?pageSize=${pageSize}&pageNumber=${currentPage}`;
+
     // Could be done in parallel with Promise.all(...)
     const jobsResponse = await axios({
       method: "get",
-      url: `${API_BASE_URL}/api/job`,
+      url: `${API_BASE_URL}/api/job` + query,
       headers: {
         Authorization: `Bearer ${jwtToken}`,
       },
@@ -37,8 +46,10 @@ export async function load({ locals }) {
     }
 
     return {
-      jobs: jobsResponse.data,
+      jobs: jobsResponse.data.content,
       companies: companiesResponse.data,
+      nrOfPages: jobsResponse.data.totalPages || 0,
+      currentPage: currentPage,
     };
   } catch (axiosError) {
     console.log("Error loading companies:", axiosError);
@@ -46,7 +57,7 @@ export async function load({ locals }) {
 }
 
 export const actions = {
-  createJob: async ({ request }) => {
+  createJob: async ({ request, locals }) => {
     const jwtToken = locals.jwt_token;
 
     if (!jwtToken) {
@@ -77,6 +88,48 @@ export const actions = {
     } catch (error) {
       console.log("Error creating job:", error);
       return { success: false, error: "Could not create job" };
+    }
+  },
+
+  assignToMe: async ({ request, url, locals }) => {
+    const jwtToken = locals.jwt_token;
+
+    if (!jwtToken) {
+      throw error(401, "Authentication required");
+    }
+
+    const data = await request.formData();
+    const jobId = data.get("jobId");
+
+    try {
+      await axios({
+        method: "put",
+        url: `${API_BASE_URL}/api/service/me/assignjob?jobId=${jobId}`,
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+    } catch (error) {
+      console.log("Error assigning job:", error);
+    }
+  },
+
+  completeMyJob: async ({ request, url, locals }) => {
+    const jwtToken = locals.jwt_token;
+
+    if (!jwtToken) {
+      throw error(401, "Authentication required");
+    }
+
+    const data = await request.formData();
+    const jobId = data.get("jobId");
+
+    try {
+      await axios({
+        method: "put",
+        url: `${API_BASE_URL}/api/service/me/completejob?jobId=${jobId}`,
+        headers: { Authorization: `Bearer ${jwtToken}` },
+      });
+    } catch (error) {
+      console.log("Error completing job:", error);
     }
   },
 };

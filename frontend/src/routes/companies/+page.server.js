@@ -3,26 +3,37 @@ import axios from "axios";
 import "dotenv/config";
 const API_BASE_URL = process.env.API_BASE_URL;
 
-export async function load({ locals }) {
+export async function load({ url, locals }) {
   const jwtToken = locals.jwt_token;
 
   if (!jwtToken) {
     return {
       companies: [],
+      nrOfPages: 0,
+      currentPage: 1,
     };
   }
 
   try {
+    // Get URL parameters for pagination
+    const currentPage = parseInt(url.searchParams.get("pageNumber") || "1");
+    const pageSize = parseInt(url.searchParams.get("pageSize") || "5");
+
+    // Build query string
+    let query = `?pageSize=${pageSize}&pageNumber=${currentPage}`;
+
     const companiesResponse = await axios({
       method: "get",
-      url: `${API_BASE_URL}/api/company`,
+      url: `${API_BASE_URL}/api/company` + query,
       headers: {
         Authorization: `Bearer ${jwtToken}`,
       },
     });
 
     return {
-      companies: companiesResponse.data,
+      companies: companiesResponse.data.content,
+      nrOfPages: companiesResponse.data.totalPages || 0,
+      currentPage: currentPage,
     };
   } catch (axiosError) {
     console.log("Error loading companies:", axiosError);
