@@ -14,6 +14,11 @@ public class UserService {
         if (userRoles.contains(role)) {
             return true;
         }
-        return false; 
+        return false;
+    }
+
+    public String getEmail() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return jwt.getClaimAsString("email");
     }
 }

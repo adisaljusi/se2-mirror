@@ -6,20 +6,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import ch.zhaw.freelance4u.model.Job;
 import ch.zhaw.freelance4u.model.JobStateAggregationDTO;
 import ch.zhaw.freelance4u.model.JobStateChangeDTO;
 import ch.zhaw.freelance4u.repository.JobRepository;
 import ch.zhaw.freelance4u.service.JobService;
+import ch.zhaw.freelance4u.service.UserService;
 
-@Controller
+@RestController
 @RequestMapping("/api/service")
 public class JobServiceController {
     @Autowired
@@ -28,26 +29,62 @@ public class JobServiceController {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private UserService userService;
+
     @PutMapping("/assignJob")
     public ResponseEntity<Job> assignJob(@RequestBody JobStateChangeDTO dto) {
-        Optional<Job> job = jobService.assignJob(dto.getJobId(), dto.getFreelancerId());
+        if (!userService.userHasRole("admin")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        String freelancerId = dto.getFreelancerId();
+        String jobId = dto.getJobId();
+        Optional<Job> job = jobService.assignJob(jobId, freelancerId);
 
         if (job.isPresent()) {
-            return ResponseEntity.ok(job.get());
-
+            return new ResponseEntity<>(job.get(), HttpStatus.OK);
         }
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("/completeJob")
     public ResponseEntity<Job> completeJob(@RequestBody JobStateChangeDTO dto) {
-        Optional<Job> job = jobService.completeJob(dto.getJobId(), dto.getFreelancerId());
-
-        if (job.isPresent()) {
-            return ResponseEntity.ok(job.get());
+        if (!userService.userHasRole("admin")) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        String freelancerId = dto.getFreelancerId();
+        String jobId = dto.getJobId();
+        Optional<Job> job = jobService.completeJob(jobId, freelancerId);
+
+        if (job.isPresent()) {
+            return new ResponseEntity<>(job.get(), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/me/assignjob")
+    public ResponseEntity<Job> assignToMe(@RequestParam String jobId) {
+        String userEmail = userService.getEmail();
+        Optional<Job> job = jobService.assignJob(jobId, userEmail);
+
+        if (job.isPresent()) {
+            return new ResponseEntity<>(job.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/me/completejob")
+    public ResponseEntity<Job> completeMyJob(@RequestParam String jobId) {
+        String userEmail = userService.getEmail();
+        Optional<Job> job = jobService.completeJob(jobId, userEmail);
+
+        if (job.isPresent()) {
+            return new ResponseEntity<>(job.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/jobDashboard")
