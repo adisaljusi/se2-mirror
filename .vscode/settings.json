@@ -1,10 +1,17 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic",
     "java.test.config": [
         {
             "name": "TestConfig",
-            "envFile": "${workspaceFolder}/.env"
+            "env": {
+                "MONGODB_URI": "${env:MONGODB_URI}",
+                "AUTH0_DOMAIN": "${env:AUTH0_DOMAIN}"
+            }
         }
     ],
-    "java.test.defaultConfig": "TestConfig"
+    "java.test.defaultConfig": "TestConfig",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "terminal.integrated.env.osx": {
+        "MONGODB_URI": "${env:MONGODB_URI}",
+        "AUTH0_DOMAIN": "${env:AUTH0_DOMAIN}"
+    }
 }
