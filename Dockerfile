@@ -1,9 +1,10 @@
-FROM openjdk:25-jdk-slim
+FROM eclipse-temurin:21-jdk
 
-RUN apt-get update && apt-get install -y supervisor curl \
- && curl -sL https://deb.nodesource.com/setup_22.x | bash - \
- && apt-get install -y nodejs \
- && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -o Acquire::Check-Valid-Until=false -o Acquire::AllowInsecureRepositories=true -o Acquire::AllowDowngradeToInsecureRepositories=true && \
+    apt-get install -y --allow-unauthenticated supervisor curl && \
+    curl -sL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
 
@@ -13,7 +14,7 @@ COPY freelance4u/pom.xml freelance4u/pom.xml
 COPY freelance4u/src freelance4u/src
 COPY frontend frontend
 
-RUN cd frontend && npm ci && npm run build
+RUN cd frontend && rm -rf node_modules package-lock.json && npm install && npm run build
 
 RUN cd freelance4u && sed -i 's/\r$//' mvnw && chmod +x mvnw
 
