@@ -67,8 +67,8 @@ export const actions = {
 
       return { success: true };
     } catch (error) {
-      console.log("Error creating job:", error);
-      return { success: false, error: "Could not create job" };
+      console.log("Error creating company:", error);
+      return { success: false, error: "Could not create company" };
     }
   },
 };

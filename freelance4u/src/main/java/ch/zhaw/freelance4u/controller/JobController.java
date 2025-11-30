@@ -2,6 +2,9 @@ package ch.zhaw.freelance4u.controller;
 
 import java.util.Optional;
 
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,24 +38,42 @@ public class JobController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    OpenAiChatModel chatModel;
+
     @PostMapping()
     public ResponseEntity<Job> createJob(@RequestBody JobCreateDTO fDto) {
         if (!userService.userHasRole("admin")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
         try {
-            Job fDAO = new Job(fDto.getTitle(), fDto.getDescription(), fDto.getJobType(), fDto.getEarnings(),
-                    fDto.getCompanyId());
-
             if (!companyService.existsById(fDto.getCompanyId())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
+
+            // Use AI to improve the job title based on the description
+            String improvedTitle = generateImprovedTitle(fDto.getTitle(), fDto.getDescription());
+
+            Job fDAO = new Job(improvedTitle, fDto.getDescription(), fDto.getJobType(), fDto.getEarnings(),
+                    fDto.getCompanyId());
 
             Job savedJob = jobRepository.save(fDAO);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedJob);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private String generateImprovedTitle(String currentTitle, String description) {
+        String prompt = String.format(
+                "Improve the following job title based on the job description. Only return the improved title, nothing else.\n\n" +
+                        "Current Title: %s\n" +
+                        "Description: %s\n\n" +
+                        "Improved Title:",
+                currentTitle, description);
+
+        ChatResponse response = chatModel.call(new Prompt(prompt));
+        return response.getResult().getOutput().getContent().trim();
     }
 
     @GetMapping()
