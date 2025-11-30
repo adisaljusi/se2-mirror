@@ -12,7 +12,8 @@
       "command": "npm run dev",
       "name": "Node: development server",
       "request": "launch",
-      "type": "node-terminal"
+      "type": "node-terminal",
+      "envFile": "${workspaceFolder}/.env"
     }
   ],
   "compounds": [

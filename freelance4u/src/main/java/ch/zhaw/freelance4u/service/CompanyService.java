@@ -1,6 +1,7 @@
 package ch.zhaw.freelance4u.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,5 +20,14 @@ public class CompanyService {
 
     public List<Company> getAllCompanies() {
         return companyRepository.findAll();
+    }
+
+    public Company createCompany(String name, String email) {
+        Company company = new Company(name, email);
+        return companyRepository.save(company);
+    }
+
+    public Optional<Company> findCompanyByName(String name) {
+        return companyRepository.findByName(name);
     }
 }
