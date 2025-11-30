@@ -9,7 +9,7 @@
         }
     ],
     "java.test.defaultConfig": "TestConfig",
-    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.configuration.updateBuildConfiguration": "automatic",
     "terminal.integrated.env.osx": {
         "MONGODB_URI": "${env:MONGODB_URI}",
         "AUTH0_DOMAIN": "${env:AUTH0_DOMAIN}"
