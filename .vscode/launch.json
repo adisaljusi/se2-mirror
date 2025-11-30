@@ -2,11 +2,26 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Freelance4uApplication",
+      "name": "Java: Freelance4uApplication",
       "request": "launch",
       "mainClass": "ch.zhaw.freelance4u.Freelance4uApplication",
       "projectName": "freelance4u",
       "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "command": "npm run dev",
+      "name": "Node: development server",
+      "request": "launch",
+      "type": "node-terminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Compound",
+      "configurations": [
+        "Java: Freelance4uApplication",
+        "Node: development server"
+      ]
     }
   ]
 }

@@ -8,14 +8,21 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -34,6 +41,9 @@ public class JobControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @MockBean
+    private OpenAiChatModel chatModel;
+
     private static String jobId;
     private static String companyId;
 
@@ -45,6 +55,11 @@ public class JobControllerTest {
     @Order(1)
     public void testCreateJob() throws Exception {
         companyId = getCompanyId();
+
+        // Mock AI response for title generation
+        ChatResponse mockChatResponse = new ChatResponse(
+                java.util.List.of(new Generation("Improved Test Job")));
+        when(chatModel.call(any(Prompt.class))).thenReturn(mockChatResponse);
 
         String jobJson = """
                 {
@@ -74,7 +89,7 @@ public class JobControllerTest {
         mockMvc.perform(get("/api/job/" + jobId)
                 .header("Authorization", "Bearer user"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Test Job"))
+                .andExpect(jsonPath("$.title").value("Improved Test Job"))
                 .andExpect(jsonPath("$.description").value("Test Description"))
                 .andExpect(jsonPath("$.companyId").value(companyId));
     }
