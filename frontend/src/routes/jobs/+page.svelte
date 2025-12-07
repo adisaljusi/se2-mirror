@@ -4,15 +4,15 @@
 
   let { data, form } = $props();
   let { user, isAuthenticated } = data;
-  let companies = $state(data.companies);
+  let companies = $state(data.companies.content);
   let jobs = $state(data.jobs);
   let currentPage = $state(data.currentPage);
   let nrOfPages = $state(data.nrOfPages);
   const pageSize = 5; // change this value if you want more elements per page
 
-  // Update jobs list when data changes (after successful form submission)
   $effect(() => {
     jobs = data.jobs;
+    companies = data.companies.content;
     currentPage = data.currentPage;
     nrOfPages = data.nrOfPages;
   });
@@ -135,7 +135,7 @@
             </form>
           {:else if job.jobState === "ASSIGNED"}
             <span class="badge bg-secondary">Assigned</span>
-          {:else if job.freelancerId === null}
+          {:else if job.freelancerId === null || job.freelancerId === ""}
             <form
               method="POST"
               action="?/assignToMe"
