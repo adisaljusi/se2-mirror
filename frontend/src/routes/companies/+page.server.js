@@ -55,6 +55,24 @@ export const actions = {
     };
 
     try {
+      const mailValidationResponse = await axios({
+        method: "get",
+        url: `https://disify.com/api/email/${company.email}`,
+      });
+
+      const mailInfo = mailValidationResponse.data;
+
+      if (
+        !mailInfo.format ||
+        mailInfo.disposable ||
+        !mailInfo.dns
+      ) {
+        return {
+          success: false,
+          error: "Invalid or temporary email address",
+        };
+      }
+
       await axios({
         method: "post",
         url: `${API_BASE_URL}/api/company`,

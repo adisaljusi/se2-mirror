@@ -36,14 +36,18 @@ public class ChatController {
 
     ChatMemory chatMemory;
 
+    @Autowired
+    FreelancerTools freelancerTools;
+
     @GetMapping("/chat")
     public ResponseEntity<String> chat(@RequestParam(required = true) String message) {
         if (!userService.userHasRole("admin")) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        String content = chatClient.prompt(
-                "Du bist ein Chatbot. Der den Benutzer Fragen beantwortet über Bestehende Jobs, deren Preis, Beschreibung, Titel und Unternehmen.")
-                .tools(new FreelancerTools(jobRepository, companyService)).user(message)
+
+        String content = chatClient.prompt()
+                .system("Du bist ein Chatbot. Der den Benutzer Fragen beantwortet über Bestehende Jobs, deren Preis, Beschreibung, Titel und Unternehmen.")
+                .user(message)
                 .call()
                 .content();
 

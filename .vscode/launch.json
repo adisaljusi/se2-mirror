@@ -6,14 +6,16 @@
       "request": "launch",
       "mainClass": "ch.zhaw.freelance4u.Freelance4uApplication",
       "projectName": "freelance4u",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}/freelance4u"
     },
     {
       "command": "npm run dev",
       "name": "Node: development server",
       "request": "launch",
       "type": "node-terminal",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}/frontend"
     }
   ],
   "compounds": [

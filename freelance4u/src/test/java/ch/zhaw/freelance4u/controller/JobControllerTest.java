@@ -8,6 +8,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -58,7 +59,7 @@ public class JobControllerTest {
 
         // Mock AI response for title generation
         ChatResponse mockChatResponse = new ChatResponse(
-                java.util.List.of(new Generation("Improved Test Job")));
+                java.util.List.of(new Generation(new AssistantMessage("Improved Test Job"))));
         when(chatModel.call(any(Prompt.class))).thenReturn(mockChatResponse);
 
         String jobJson = """

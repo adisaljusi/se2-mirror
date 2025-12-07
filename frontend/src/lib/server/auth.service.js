@@ -71,8 +71,6 @@ async function login(username, password, cookies) {
     const response = await axios(options);
     const { id_token, access_token } = response.data;
 
-    console.log(id_token);
-    
     // Get user info and set cookies
     const userInfo = await getUserInfo(access_token);
     

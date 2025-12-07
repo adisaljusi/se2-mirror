@@ -13,5 +13,6 @@
     "terminal.integrated.env.osx": {
         "MONGODB_URI": "${env:MONGODB_URI}",
         "AUTH0_DOMAIN": "${env:AUTH0_DOMAIN}"
-    }
+    },
+    "java.compile.nullAnalysis.mode": "automatic"
 }

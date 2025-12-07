@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.zhaw.freelance4u.model.Job;
 import ch.zhaw.freelance4u.model.JobStateAggregationDTO;
 import ch.zhaw.freelance4u.model.JobStateChangeDTO;
+import ch.zhaw.freelance4u.model.Mail;
 import ch.zhaw.freelance4u.repository.JobRepository;
 import ch.zhaw.freelance4u.service.JobService;
+import ch.zhaw.freelance4u.service.MailService;
 import ch.zhaw.freelance4u.service.UserService;
 
 @RestController
@@ -31,6 +33,9 @@ public class JobServiceController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MailService mailService;
 
     @PutMapping("/assignJob")
     public ResponseEntity<Job> assignJob(@RequestBody JobStateChangeDTO dto) {
@@ -71,7 +76,14 @@ public class JobServiceController {
         Optional<Job> job = jobService.assignJob(jobId, userEmail);
 
         if (job.isPresent()) {
-            return new ResponseEntity<>(job.get(), HttpStatus.OK);
+            Job assignedJob = job.get();
+            Mail mail = new Mail(
+                    userEmail,
+                    "Job Assigned",
+                    "You have been assigned to job: " + assignedJob.getTitle() + "\nStatus: " + assignedJob.getJobState()
+            );
+            mailService.sendMail(mail);
+            return new ResponseEntity<>(assignedJob, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
@@ -82,7 +94,14 @@ public class JobServiceController {
         Optional<Job> job = jobService.completeJob(jobId, userEmail);
 
         if (job.isPresent()) {
-            return new ResponseEntity<>(job.get(), HttpStatus.OK);
+            Job completedJob = job.get();
+            Mail mail = new Mail(
+                    userEmail,
+                    "Job Completed",
+                    "You have completed job: " + completedJob.getTitle() + "\nStatus: " + completedJob.getJobState()
+            );
+            mailService.sendMail(mail);
+            return new ResponseEntity<>(completedJob, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
